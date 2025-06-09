@@ -39,6 +39,6 @@
             ]
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "0.0.1",
     "prefer-stable": true
 }
