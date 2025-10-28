@@ -3,6 +3,14 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | Драйвер хранилища
+    |--------------------------------------------------------------------------
+    | Поддерживаемые драйверы: 'redis', 'vault'
+    */
+    'storage_driver' => env('CONNECTION_STORAGE_DRIVER', 'redis'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Настройки кеша
     |--------------------------------------------------------------------------
     */
@@ -10,6 +18,19 @@ return [
         'store' => env('CONNECTION_STORAGE_CACHE_STORE', 'redis'),
         'ttl' => env('CONNECTION_STORAGE_CACHE_TTL', 86400), // 24 часа
         'prefix' => env('CONNECTION_STORAGE_CACHE_PREFIX', 'connection_data_'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Настройки HashiCorp Vault
+    |--------------------------------------------------------------------------
+    */
+    'vault' => [
+        'url' => env('VAULT_URL', 'http://localhost:8200'),
+        'login' => env('VAULT_LOGIN', 'mcrm'),
+        'password' => env('VAULT_PASS', ''),
+        'mount_path' => env('VAULT_MOUNT_PATH', 'secret'),
+        'timeout' => env('VAULT_TIMEOUT', 10),
     ],
 
     /*

@@ -6,7 +6,7 @@ namespace Mcrm\LaravelConnectionStorage\Services;
 
 use Mcrm\LaravelConnectionStorage\DTO\BaseConnectionDataDTO;
 use Mcrm\LaravelConnectionStorage\Interfaces\ConnectionValidatorInterface;
-use Illuminate\Support\Facades\Cache;
+use Mcrm\LaravelConnectionStorage\Interfaces\StorageDriverInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -16,13 +16,13 @@ use Illuminate\Support\Facades\Log;
 class ConnectionValidator implements ConnectionValidatorInterface
 {
     /**
-     * @param  string  $cacheStore  Хранилище кэша для блокировок
+     * @param  StorageDriverInterface  $storageDriver  Драйвер хранилища
      * @param  int  $validationTimeout  Таймаут валидации в секундах
      * @param  int  $blockDuration  Время блокировки в секундах
      * @param  string  $blockPrefix  Префикс ключей блокировки
      */
     public function __construct(
-        private readonly string $cacheStore = 'redis',
+        private readonly StorageDriverInterface $storageDriver,
         private readonly int $validationTimeout = 5,
         private readonly int $blockDuration = 1800,
         private readonly string $blockPrefix = 'connection_block_'
@@ -110,16 +110,7 @@ class ConnectionValidator implements ConnectionValidatorInterface
     {
         $key = $this->getBlockKey($url);
         
-        try {
-            return Cache::store($this->cacheStore)->has($key);
-        } catch (\Throwable $e) {
-            Log::error('Ошибка при проверке блокировки URL', [
-                'url' => $url,
-                'error' => $e->getMessage(),
-            ]);
-            
-            return false;
-        }
+        return $this->storageDriver->has($key);
     }
 
     /**
@@ -134,17 +125,7 @@ class ConnectionValidator implements ConnectionValidatorInterface
         $key = $this->getBlockKey($url);
         $duration = $duration ?? $this->blockDuration;
         
-        try {
-            return Cache::store($this->cacheStore)->put($key, time(), $duration);
-        } catch (\Throwable $e) {
-            Log::error('Ошибка при блокировке URL', [
-                'url' => $url,
-                'duration' => $duration,
-                'error' => $e->getMessage(),
-            ]);
-            
-            return false;
-        }
+        return $this->storageDriver->put($key, time(), $duration);
     }
 
     /**
@@ -157,16 +138,7 @@ class ConnectionValidator implements ConnectionValidatorInterface
     {
         $key = $this->getBlockKey($url);
         
-        try {
-            return Cache::store($this->cacheStore)->forget($key);
-        } catch (\Throwable $e) {
-            Log::error('Ошибка при разблокировке URL', [
-                'url' => $url,
-                'error' => $e->getMessage(),
-            ]);
-            
-            return false;
-        }
+        return $this->storageDriver->forget($key);
     }
 
     /**

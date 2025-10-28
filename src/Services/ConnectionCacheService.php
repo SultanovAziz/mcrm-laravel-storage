@@ -6,7 +6,7 @@ namespace Mcrm\LaravelConnectionStorage\Services;
 
 use Mcrm\LaravelConnectionStorage\DTO\BaseConnectionDataDTO;
 use Mcrm\LaravelConnectionStorage\Interfaces\ConnectionCacheServiceInterface;
-use Illuminate\Support\Facades\Cache;
+use Mcrm\LaravelConnectionStorage\Interfaces\StorageDriverInterface;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -20,11 +20,11 @@ class ConnectionCacheService implements ConnectionCacheServiceInterface
     private const DEFAULT_TTL = 86400;
 
     /**
-     * @param  string  $cacheStore  Хранилище кэша (redis)
+     * @param  StorageDriverInterface  $storageDriver  Драйвер хранилища
      * @param  string  $cachePrefix  Префикс ключей кэша
      */
     public function __construct(
-        private readonly string $cacheStore = 'redis',
+        private readonly StorageDriverInterface $storageDriver,
         private readonly string $cachePrefix = 'connection_data_'
     ) {}
 
@@ -38,7 +38,7 @@ class ConnectionCacheService implements ConnectionCacheServiceInterface
     {
         $key = $this->getCacheKey($url);
         /** @var array<string, mixed>|null $data */
-        $data = Cache::store($this->cacheStore)->get($key);
+        $data = $this->storageDriver->get($key);
 
         if (!$data) {
             return null;
@@ -68,7 +68,7 @@ class ConnectionCacheService implements ConnectionCacheServiceInterface
     {
         $key = $this->getCacheKey($url);
         /** @var array<string, mixed>|null $data */
-        $data = Cache::store($this->cacheStore)->get($key);
+        $data = $this->storageDriver->get($key);
 
         return $data ?: null;
     }
@@ -98,20 +98,7 @@ class ConnectionCacheService implements ConnectionCacheServiceInterface
         $key = $this->getCacheKey($url);
         $ttl = $ttl ?? self::DEFAULT_TTL;
 
-        try {
-            return Cache::store($this->cacheStore)->put(
-                $key,
-                $data,
-                $ttl
-            );
-        } catch (\Throwable $e) {
-            Log::error('Ошибка при сохранении данных подключения в кэш', [
-                'url' => $url,
-                'message' => $e->getMessage(),
-            ]);
-
-            return false;
-        }
+        return $this->storageDriver->put($key, $data, $ttl);
     }
 
     /**
@@ -124,16 +111,7 @@ class ConnectionCacheService implements ConnectionCacheServiceInterface
     {
         $key = $this->getCacheKey($url);
 
-        try {
-            return Cache::store($this->cacheStore)->forget($key);
-        } catch (\Throwable $e) {
-            Log::error('Ошибка при удалении данных подключения из кэша', [
-                'url' => $url,
-                'message' => $e->getMessage(),
-            ]);
-
-            return false;
-        }
+        return $this->storageDriver->forget($key);
     }
 
     /**
@@ -150,7 +128,7 @@ class ConnectionCacheService implements ConnectionCacheServiceInterface
         $ttl = $ttl ?? self::DEFAULT_TTL;
 
         try {
-            $data = Cache::store($this->cacheStore)->remember(
+            $data = $this->storageDriver->remember(
                 $key,
                 $ttl,
                 function () use ($callback) {

@@ -11,11 +11,14 @@ use Mcrm\LaravelConnectionStorage\Interfaces\ConnectionDataProviderInterface;
 use Mcrm\LaravelConnectionStorage\Interfaces\ConnectionNotifierInterface;
 use Mcrm\LaravelConnectionStorage\Interfaces\ConnectionValidatorInterface;
 use Mcrm\LaravelConnectionStorage\Interfaces\ExternalConnectionServiceInterface;
+use Mcrm\LaravelConnectionStorage\Interfaces\StorageDriverInterface;
 use Mcrm\LaravelConnectionStorage\Services\ConnectionCacheService;
 use Mcrm\LaravelConnectionStorage\Services\ConnectionDataProvider;
 use Mcrm\LaravelConnectionStorage\Services\ConnectionNotifier;
 use Mcrm\LaravelConnectionStorage\Services\ConnectionValidator;
 use Mcrm\LaravelConnectionStorage\Services\ExternalConnectionService;
+use Mcrm\LaravelConnectionStorage\Drivers\RedisStorageDriver;
+use Mcrm\LaravelConnectionStorage\Drivers\VaultStorageDriver;
 
 class ConnectionStorageServiceProvider extends ServiceProvider
 {
@@ -35,11 +38,32 @@ class ConnectionStorageServiceProvider extends ServiceProvider
             );
         }
 
+        // Регистрация драйвера хранилища
+        $this->app->singleton(StorageDriverInterface::class, function (Application $app) {
+            $config = $app['config']['connection-storage'];
+            $driver = $config['storage_driver'] ?? 'redis';
+
+            return match ($driver) {
+                'vault' => new VaultStorageDriver(
+                    $config['vault']['url'],
+                    $config['vault']['login'],
+                    $config['vault']['password'],
+                    $config['service']['key'],
+                    $config['vault']['mount_path'],
+                    $config['vault']['timeout']
+                ),
+                'redis' => new RedisStorageDriver(
+                    $config['cache']['store']
+                ),
+                default => throw new \InvalidArgumentException("Неподдерживаемый драйвер хранилища: {$driver}")
+            };
+        });
+
         $this->app->singleton(ConnectionCacheServiceInterface::class, function (Application $app) {
             $config = $app['config']['connection-storage'];
             
             return new ConnectionCacheService(
-                $config['cache']['store'],
+                $app->make(StorageDriverInterface::class),
                 $config['cache']['prefix']
             );
         });
@@ -58,7 +82,7 @@ class ConnectionStorageServiceProvider extends ServiceProvider
             $config = $app['config']['connection-storage'];
             
             return new ConnectionValidator(
-                $config['cache']['store'],
+                $app->make(StorageDriverInterface::class),
                 $config['validation']['timeout'],
                 $config['validation']['block_duration'],
                 $config['validation']['block_prefix']
