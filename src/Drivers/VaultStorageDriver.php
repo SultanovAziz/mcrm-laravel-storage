@@ -109,7 +109,7 @@ class VaultStorageDriver implements StorageDriverInterface
         try {
             $response = Http::timeout($this->timeout)
                 ->withToken($token)
-                ->get("{$this->url}/v1/{$this->mountPath}/data/{$this->service}/{$key}");
+                ->get("{$this->url}/v1/{$this->mountPath}/data/{$key}/{$this->service}");
 
             if (!$response->successful()) {
                 if ($response->status() === 404) {
@@ -170,7 +170,7 @@ class VaultStorageDriver implements StorageDriverInterface
 
             $response = Http::timeout($this->timeout)
                 ->withToken($token)
-                ->post("{$this->url}/v1/{$this->mountPath}/data/{$this->service}/{$key}", [
+                ->post("{$this->url}/v1/{$this->mountPath}/data/{$key}/{$this->service}", [
                     'data' => [
                         'value' => $value,
                         'expires_at' => $expiresAt,
@@ -213,7 +213,7 @@ class VaultStorageDriver implements StorageDriverInterface
         try {
             $response = Http::timeout($this->timeout)
                 ->withToken($token)
-                ->delete("{$this->url}/v1/{$this->mountPath}/metadata/{$this->service}/{$key}");
+                ->delete("{$this->url}/v1/{$this->mountPath}/metadata/{$key}/{$this->service}");
 
             if (!$response->successful() && $response->status() !== 404) {
                 Log::error('Ошибка при удалении данных из Vault', [

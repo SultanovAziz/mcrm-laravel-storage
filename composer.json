@@ -1,6 +1,6 @@
 {
     "name": "mcrm/laravel-connection-storage",
-    "version": "v0.4.2",
+    "version": "v0.4.3",
     "description": "Flexible Laravel package for managing external database connections with Redis cache and HTTP API fallback. Supports customizable DTOs and multiple connection types for microservices architecture.",
     "type": "library",
     "keywords": [
