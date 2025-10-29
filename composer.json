@@ -1,6 +1,6 @@
 {
     "name": "mcrm/laravel-connection-storage",
-    "version": "v0.4.3",
+    "version": "v0.4.4",
     "description": "Flexible Laravel package for managing external database connections with Redis cache and HTTP API fallback. Supports customizable DTOs and multiple connection types for microservices architecture.",
     "type": "library",
     "keywords": [
@@ -20,17 +20,17 @@
         }
     ],
     "require": {
-        "php": "^8.1|^8.2|^8.3",
-        "illuminate/support": "^10.0|^11.0|^12.0",
-        "illuminate/cache": "^10.0|^11.0|^12.0",
-        "illuminate/http": "^10.0|^11.0|^12.0",
-        "illuminate/log": "^10.0|^11.0|^12.0",
-        "illuminate/config": "^10.0|^11.0|^12.0",
-        "illuminate/database": "^10.0|^11.0|^12.0"
+        "php": "^8.1",
+        "illuminate/support": "^10.0",
+        "illuminate/cache": "^10.0",
+        "illuminate/http": "^10.0",
+        "illuminate/log": "^10.0",
+        "illuminate/config": "^10.0",
+        "illuminate/database": "^10.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.0|^11.0",
-        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "phpunit/phpunit": "^10.0",
+        "orchestra/testbench": "^8.0",
         "phpstan/phpstan": "^1.10"
     },
     "autoload": {
