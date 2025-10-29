@@ -31,7 +31,7 @@ class ConnectionDataDTO extends BaseConnectionDataDTO
         $requiredFields = static::getRequiredFields();
 
         // Проверяем наличие всех обязательных полей
-        if (count(array_diff($requiredFields, $data)) > 0) {
+        if (count(array_diff($requiredFields, array_keys($data))) > 0) {
             return null;
         }
 
