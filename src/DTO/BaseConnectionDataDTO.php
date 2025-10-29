@@ -13,7 +13,6 @@ abstract class BaseConnectionDataDTO
     /**
      * Конструктор
      *
-     * @param  string  $boxName  Название коробки
      * @param  array<string, array<string, mixed>>  $connections  Все подключения
      */
     public function __construct(
