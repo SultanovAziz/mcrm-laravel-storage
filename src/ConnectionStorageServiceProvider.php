@@ -53,7 +53,8 @@ class ConnectionStorageServiceProvider extends ServiceProvider
                     $config['vault']['timeout']
                 ),
                 'redis' => new RedisStorageDriver(
-                    $config['cache']['store']
+                    $config['cache']['store'],
+                    $config['service']['key']
                 ),
                 default => throw new \InvalidArgumentException("Неподдерживаемый драйвер хранилища: {$driver}")
             };

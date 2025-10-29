@@ -17,7 +17,7 @@ class ConnectionDataDTO extends BaseConnectionDataDTO
      */
     protected static function getRequiredFields(): array
     {
-        return ['db', 'rabbitmq', 'boxname'];
+        return ['db', 'rabbitmq'];
     }
 
     /**
@@ -31,25 +31,19 @@ class ConnectionDataDTO extends BaseConnectionDataDTO
         $requiredFields = static::getRequiredFields();
 
         // Проверяем наличие всех обязательных полей
-        foreach ($requiredFields as $field) {
-            if (!isset($data[$field])) {
-                return null;
-            }
+        if (count(array_diff($requiredFields, $data)) > 0) {
+            return null;
         }
-
-        /** @var string $boxName */
-        $boxName = $data['boxname'];
 
         // Извлекаем все подключения, исключая boxname
         $connections = [];
         foreach ($data as $key => $value) {
-            if ($key !== 'boxname' && is_array($value)) {
+            if (is_array($value)) {
                 $connections[$key] = $value;
             }
         }
 
         return new static(
-            boxName: $boxName,
             connections: $connections
         );
     }

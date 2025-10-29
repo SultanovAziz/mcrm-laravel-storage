@@ -15,9 +15,11 @@ class RedisStorageDriver implements StorageDriverInterface
 {
     /**
      * @param  string  $store  Название хранилища Cache
+     * @param  string  $service  Ключ сервиса для извлечения данных
      */
     public function __construct(
-        private readonly string $store = 'redis'
+        private readonly string $store,
+        private readonly string $service
     ) {}
 
     /**
@@ -26,7 +28,13 @@ class RedisStorageDriver implements StorageDriverInterface
     public function get(string $key): mixed
     {
         try {
-            return Cache::store($this->store)->get($key);
+            $data = Cache::store($this->store)->get($key);
+
+            if (isset($data[$this->service])) {
+                return $data[$this->service];
+            }
+
+            return null;
         } catch (\Throwable $e) {
             Log::error('Ошибка при получении данных из Redis', [
                 'key' => $key,

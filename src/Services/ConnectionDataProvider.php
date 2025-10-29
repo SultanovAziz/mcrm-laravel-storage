@@ -48,19 +48,15 @@ class ConnectionDataProvider implements ConnectionDataProviderInterface
             return null;
         }
 
-        // Сначала пытаемся получить сырые данные из кэша
-        $rawCacheData = $this->cacheService->getRawConnectionData($identifier);
+        // Сначала пытаемся получить данные из кэша
+        $connectionData = $this->cacheService->getConnectionData($identifier);
 
-        if ($rawCacheData !== null) {
-            $connectionData = $this->processConnectionData($rawCacheData, $identifier, 'cache');
-
-            if ($connectionData !== null) {
-                if ($this->validationEnabled && !$this->validateAndNotify($connectionData, $identifier, 'cache')) {
-                    return null;
-                }
-
-                return $connectionData;
+        if ($connectionData !== null) {
+            if ($this->validationEnabled && !$this->validateAndNotify($connectionData, $identifier, 'cache')) {
+                return null;
             }
+
+            return $connectionData;
         }
 
         // Если в кэше нет, запрашиваем у внешнего сервиса
@@ -94,11 +90,32 @@ class ConnectionDataProvider implements ConnectionDataProviderInterface
                 return null;
             }
 
-            $connectionData = $this->processConnectionData($rawData, $identifier, 'external_api');
-
-            if ($connectionData === null) {
+            // Извлекаем данные для нашего сервиса
+            if (!isset($rawData[$this->serviceKey])) {
+                $this->notifier->notifyInvalidConnection(
+                    $identifier,
+                    "Данные для сервиса '{$this->serviceKey}' не найдены в external_api",
+                    ['available_services' => array_keys($rawData)]
+                );
                 return null;
             }
+
+            $serviceData = $rawData[$this->serviceKey];
+
+            // Создаем DTO из данных сервиса
+            $connectionData = call_user_func([$this->dtoClass, 'fromArray'], $serviceData);
+
+            if ($connectionData === null) {
+                $this->notifier->notifyInvalidConnection(
+                    $identifier,
+                    "Невозможно создать DTO из данных external_api",
+                    ['service_key' => $this->serviceKey]
+                );
+                return null;
+            }
+
+            // Кэшируем полученные данные
+            $this->cacheService->cacheConnectionData($identifier, $rawData);
 
             // Проверяем валидность полученных данных
             if ($this->validationEnabled && !$this->validateAndNotify($connectionData, $identifier, 'external_api')) {
@@ -118,17 +135,6 @@ class ConnectionDataProvider implements ConnectionDataProviderInterface
 
             return null;
         }
-    }
-
-    /**
-     * Извлекает данные для текущего сервиса из общего массива
-     *
-     * @param  array<string, mixed>  $rawData  Сырые данные
-     * @return BaseConnectionDataDTO|null Данные сервиса
-     */
-    private function extractServiceData(array $rawData): ?BaseConnectionDataDTO
-    {
-        return $rawData[$this->serviceKey] ?? null;
     }
 
     /**
@@ -172,42 +178,5 @@ class ConnectionDataProvider implements ConnectionDataProviderInterface
 
         // Здесь можно добавить проверку других типов соединений
         // например, RabbitMQ, Elasticsearch и т.д.
-    }
-
-    /**
-     * Обрабатывает сырые данные подключения (извлекает данные сервиса и создает DTO)
-     *
-     * @param  array<string, mixed>  $rawData  Сырые данные
-     * @param  string  $identifier  Идентификатор
-     * @param  string  $source  Источник данных (cache/external_api)
-     * @return BaseConnectionDataDTO|null Обработанные данные подключения
-     */
-    private function processConnectionData(array $rawData, string $identifier, string $source): ?BaseConnectionDataDTO
-    {
-        // Извлекаем данные для нашего сервиса
-        /** @var BaseConnectionDataDTO $connectionDto */
-        $connectionDto = $this->extractServiceData($rawData);
-        if ($connectionDto === null) {
-            $this->notifier->notifyInvalidConnection(
-                $identifier,
-                "Данные для сервиса '{$this->serviceKey}' не найдены в {$source}",
-                ['available_services' => array_keys($rawData)]
-            );
-            return null;
-        }
-
-        // Создаем DTO из полученных данных
-//        $connectionData = call_user_func([$this->dtoClass, 'fromArray'], $serviceData);
-//
-//        if ($connectionData === null) {
-//            $this->notifier->notifyInvalidConnection(
-//                $identifier,
-//                "Невозможно создать DTO из данных {$source}",
-//                ['raw_data' => $serviceData]
-//            );
-//            return null;
-//        }
-
-        return $connectionDto;
     }
 }

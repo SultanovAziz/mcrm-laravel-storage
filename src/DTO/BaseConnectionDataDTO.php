@@ -17,7 +17,6 @@ abstract class BaseConnectionDataDTO
      * @param  array<string, array<string, mixed>>  $connections  Все подключения
      */
     public function __construct(
-        public readonly string $boxName,
         public readonly array $connections = []
     ) {}
 
@@ -44,9 +43,7 @@ abstract class BaseConnectionDataDTO
      */
     public function toArray(): array
     {
-        $result = [
-            'boxname' => $this->boxName,
-        ];
+        $result = [];
 
         // Добавляем все подключения
         foreach ($this->connections as $key => $value) {
@@ -56,15 +53,6 @@ abstract class BaseConnectionDataDTO
         return $result;
     }
 
-    /**
-     * Получает название коробки
-     *
-     * @return string Название коробки
-     */
-    public function getBoxName(): string
-    {
-        return $this->boxName;
-    }
 
     /**
      * Получает конфигурацию подключения по типу
