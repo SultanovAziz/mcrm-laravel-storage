@@ -59,8 +59,10 @@ class ConnectionValidator implements ConnectionValidatorInterface
                 ],
             ];
 
-            if (!empty($config['isUseCert']) && $config['isUseCert'] === 1) {
-                $databaseConfig['attributes'] = [
+            if (!empty($config['isUseCert']) && $config['isUseCert'] === 1
+                && !empty($this->crt) && file_exists($this->crtPath)
+            ) {
+                $databaseConfig['options'] = [
                     \PDO::MYSQL_ATTR_SSL_CA => $this->crtPath,
                 ];
             }
