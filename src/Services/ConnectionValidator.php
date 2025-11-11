@@ -25,7 +25,8 @@ class ConnectionValidator implements ConnectionValidatorInterface
         private readonly StorageDriverInterface $storageDriver,
         private readonly int $validationTimeout = 5,
         private readonly int $blockDuration = 1800,
-        private readonly string $blockPrefix = 'connection_block_'
+        private readonly string $blockPrefix = 'connection_block_',
+        private readonly string $crtPath = '',
     ) {}
 
     /**
@@ -44,20 +45,28 @@ class ConnectionValidator implements ConnectionValidatorInterface
             // Создаем временное соединение для проверки
             $connectionName = 'validation_' . uniqid();
             
-            config([
-                "database.connections.{$connectionName}" => [
-                    'driver' => $config['driver'] ?? 'mysql',
-                    'host' => $config['host'],
-                    'port' => $config['port'],
-                    'database' => $config['database'],
-                    'username' => $config['username'],
-                    'password' => $config['password'],
-                    'charset' => $config['charset'] ?? 'utf8mb4',
-                    'collation' => $config['collation'] ?? 'utf8mb4_unicode_ci',
-                    'options' => [
-                        \PDO::ATTR_TIMEOUT => $this->validationTimeout,
-                    ],
+            $databaseConfig = [
+                'driver' => $config['driver'] ?? 'mysql',
+                'host' => $config['host'],
+                'port' => $config['port'],
+                'database' => $config['database'],
+                'username' => $config['username'],
+                'password' => $config['password'],
+                'charset' => $config['charset'] ?? 'utf8mb4',
+                'collation' => $config['collation'] ?? 'utf8mb4_unicode_ci',
+                'options' => [
+                    \PDO::ATTR_TIMEOUT => $this->validationTimeout,
                 ],
+            ];
+
+            if (!empty($config['isUseCert']) && $config['isUseCert'] === 1) {
+                $databaseConfig['attributes'] = [
+                    \PDO::MYSQL_ATTR_SSL_CA => $this->crtPath,
+                ];
+            }
+
+            config([
+                "database.connections.{$connectionName}" => $databaseConfig,
             ]);
 
             $connection = DB::connection($connectionName);

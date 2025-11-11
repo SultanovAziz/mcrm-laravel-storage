@@ -86,7 +86,8 @@ class ConnectionStorageServiceProvider extends ServiceProvider
                 $app->make(StorageDriverInterface::class),
                 $config['validation']['timeout'],
                 $config['validation']['block_duration'],
-                $config['validation']['block_prefix']
+                $config['validation']['block_prefix'],
+                $config['validation']['crt_path']
             );
         });
 

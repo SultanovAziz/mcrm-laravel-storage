@@ -85,6 +85,8 @@ return [
         
         // Префикс ключей блокировки в Redis
         'block_prefix' => env('CONNECTION_STORAGE_BLOCK_PREFIX', 'connection_block_'),
+        
+        'crt_path' => env('CRT_PATH', '/mcrm.crt'),
     ],
 
     /*
