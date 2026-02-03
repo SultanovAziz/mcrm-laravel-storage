@@ -128,7 +128,7 @@ class VaultStorageDriver implements StorageDriverInterface
             $data = $response->json();
 
             // Vault возвращает данные в формате: data.data.value
-            if (!isset($data['data']['data']['value'])) {
+            if (!isset($data['data']['data'])) {
                 return null;
             }
 
@@ -142,7 +142,7 @@ class VaultStorageDriver implements StorageDriverInterface
                 }
             }
 
-            return $storedData['value'];
+            return $storedData;
         } catch (\Throwable $e) {
             Log::error('Ошибка при получении данных из Vault', [
                 'key' => $key,
