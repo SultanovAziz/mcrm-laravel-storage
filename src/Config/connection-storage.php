@@ -17,7 +17,7 @@ return [
     'cache' => [
         'store' => env('CONNECTION_STORAGE_CACHE_STORE', 'redis'),
         'ttl' => env('CONNECTION_STORAGE_CACHE_TTL', 86400), // 24 часа
-        'prefix' => env('CONNECTION_STORAGE_CACHE_PREFIX', 'connection_data_'),
+        'prefix' => env('CONNECTION_STORAGE_CACHE_PREFIX', ''),
     ],
 
     /*
@@ -80,8 +80,8 @@ return [
         // Таймаут для проверки соединения в секундах
         'timeout' => env('CONNECTION_STORAGE_VALIDATION_TIMEOUT', 5),
         
-        // Время блокировки запросов после ошибки в секундах (30 минут)
-        'block_duration' => env('CONNECTION_STORAGE_BLOCK_DURATION', 1800),
+        // Время блокировки запросов после ошибки в секундах (5 минут)
+        'block_duration' => env('CONNECTION_STORAGE_BLOCK_DURATION', 3000),
         
         // Префикс ключей блокировки в Redis
         'block_prefix' => env('CONNECTION_STORAGE_BLOCK_PREFIX', 'connection_block_'),

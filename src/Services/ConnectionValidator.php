@@ -49,7 +49,7 @@ class ConnectionValidator implements ConnectionValidatorInterface
                 'driver' => $config['driver'] ?? 'mysql',
                 'host' => $config['host'],
                 'port' => $config['port'],
-                'database' => $config['database'],
+                'database' => $config['dbname'],
                 'username' => $config['username'],
                 'password' => $config['password'],
                 'charset' => $config['charset'] ?? 'utf8mb4',
@@ -160,7 +160,7 @@ class ConnectionValidator implements ConnectionValidatorInterface
      */
     private function hasRequiredDbParams(array $config): bool
     {
-        $required = ['host', 'port', 'database', 'username', 'password'];
+        $required = ['host', 'port', 'dbname', 'username', 'password'];
         
         foreach ($required as $param) {
             if (!isset($config[$param]) || empty($config[$param])) {
