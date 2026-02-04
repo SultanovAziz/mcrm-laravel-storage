@@ -44,9 +44,9 @@ class ConnectionDataProvider implements ConnectionDataProviderInterface
      */
     public function getConnectionData(string $identifier): ?BaseConnectionDataDTO
     {
-        if ($this->validator->isBlocked($identifier)) {
-            return null;
-        }
+        // if ($this->validator->isBlocked($identifier)) {
+        //     return null;
+        // }
 
         // Сначала пытаемся получить данные из кэша
         $connectionData = $this->cacheService->getConnectionData($identifier);
@@ -150,7 +150,7 @@ class ConnectionDataProvider implements ConnectionDataProviderInterface
         if (!$this->validator->validateConnectionData($connectionData)) {
             $this->validateIndividualConnections($connectionData, $identifier);
 
-            $this->validator->blockUrl($identifier);
+            //$this->validator->blockUrl($identifier);
 
             return false;
         }
