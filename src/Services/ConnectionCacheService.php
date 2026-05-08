@@ -49,7 +49,7 @@ class ConnectionCacheService implements ConnectionCacheServiceInterface
             $dtoClass = config('connection-storage.dto.class', \Mcrm\LaravelConnectionStorage\DTO\ConnectionDataDTO::class);
             return $dtoClass::fromArray($data);
         } catch (\Throwable $e) {
-            Log::warning('Ошибка при десериализации данных подключения из кэша', [
+            Log::channel('stderr')->warning('Ошибка при десериализации данных подключения из кэша', [
                 'url' => $url,
                 'message' => $e->getMessage(),
             ]);
@@ -162,7 +162,7 @@ class ConnectionCacheService implements ConnectionCacheServiceInterface
             $dtoClass = config('connection-storage.dto.class', \Mcrm\LaravelConnectionStorage\DTO\ConnectionDataDTO::class);
             return $dtoClass::fromArray($data);
         } catch (\Throwable $e) {
-            Log::error('Ошибка при работе с кэшем данных подключения', [
+            Log::channel('stderr')->error('Ошибка при работе с кэшем данных подключения', [
                 'url' => $url,
                 'message' => $e->getMessage(),
             ]);
@@ -171,7 +171,7 @@ class ConnectionCacheService implements ConnectionCacheServiceInterface
             try {
                 return $callback();
             } catch (\Throwable $innerException) {
-                Log::error('Ошибка при получении данных через callback', [
+                Log::channel('stderr')->error('Ошибка при получении данных через callback', [
                     'url' => $url,
                     'message' => $innerException->getMessage(),
                 ]);

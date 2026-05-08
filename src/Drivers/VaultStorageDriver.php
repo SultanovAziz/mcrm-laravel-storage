@@ -62,7 +62,7 @@ class VaultStorageDriver implements StorageDriverInterface
                 ]);
 
             if (!$response->successful()) {
-                Log::error('Ошибка авторизации в Vault', [
+                Log::channel('stderr')->error('Ошибка авторизации в Vault', [
                     'login' => $this->login,
                     'status' => $response->status(),
                 ]);
@@ -72,7 +72,7 @@ class VaultStorageDriver implements StorageDriverInterface
             $responseBody = $response->json();
 
             if (!isset($responseBody['auth']['client_token'])) {
-                Log::error('Не удалось получить токен из ответа Vault');
+                Log::channel('stderr')->error('Не удалось получить токен из ответа Vault');
                 return null;
             }
 
@@ -86,7 +86,7 @@ class VaultStorageDriver implements StorageDriverInterface
 
             return $token;
         } catch (\Throwable $e) {
-            Log::error('Ошибка авторизации в Vault', [
+            Log::channel('stderr')->error('Ошибка авторизации в Vault', [
                 'login' => $this->login,
                 'error' => $e->getMessage(),
             ]);
@@ -102,7 +102,7 @@ class VaultStorageDriver implements StorageDriverInterface
     {
         $token = $this->getAuthenticatedToken();
         if ($token === null) {
-            Log::error('Не удалось получить токен для Vault');
+            Log::channel('stderr')->error('Не удалось получить токен для Vault');
             return null;
         }
 
@@ -116,7 +116,7 @@ class VaultStorageDriver implements StorageDriverInterface
                     return null;
                 }
 
-                Log::error('Ошибка при получении данных из Vault', [
+                Log::channel('stderr')->error('Ошибка при получении данных из Vault', [
                     'key' => $key,
                     'service' => $this->service,
                     'status' => $response->status(),
@@ -144,7 +144,7 @@ class VaultStorageDriver implements StorageDriverInterface
 
             return $storedData;
         } catch (\Throwable $e) {
-            Log::error('Ошибка при получении данных из Vault', [
+            Log::channel('stderr')->error('Ошибка при получении данных из Vault', [
                 'key' => $key,
                 'service' => $this->service,
                 'error' => $e->getMessage(),
@@ -161,7 +161,7 @@ class VaultStorageDriver implements StorageDriverInterface
     {
         $token = $this->getAuthenticatedToken();
         if ($token === null) {
-            Log::error('Не удалось получить токен для Vault');
+            Log::channel('stderr')->error('Не удалось получить токен для Vault');
             return false;
         }
 
@@ -178,7 +178,7 @@ class VaultStorageDriver implements StorageDriverInterface
                 ]);
 
             if (!$response->successful()) {
-                Log::error('Ошибка при сохранении данных в Vault', [
+                Log::channel('stderr')->error('Ошибка при сохранении данных в Vault', [
                     'key' => $key,
                     'service' => $this->service,
                     'status' => $response->status(),
@@ -189,7 +189,7 @@ class VaultStorageDriver implements StorageDriverInterface
 
             return true;
         } catch (\Throwable $e) {
-            Log::error('Ошибка при сохранении данных в Vault', [
+            Log::channel('stderr')->error('Ошибка при сохранении данных в Vault', [
                 'key' => $key,
                 'service' => $this->service,
                 'error' => $e->getMessage(),
@@ -206,7 +206,7 @@ class VaultStorageDriver implements StorageDriverInterface
     {
         $token = $this->getAuthenticatedToken();
         if ($token === null) {
-            Log::error('Не удалось получить токен для Vault');
+            Log::channel('stderr')->error('Не удалось получить токен для Vault');
             return false;
         }
 
@@ -216,7 +216,7 @@ class VaultStorageDriver implements StorageDriverInterface
                 ->delete("{$this->url}/v1/{$this->mountPath}/metadata/{$key}/{$this->service}");
 
             if (!$response->successful() && $response->status() !== 404) {
-                Log::error('Ошибка при удалении данных из Vault', [
+                Log::channel('stderr')->error('Ошибка при удалении данных из Vault', [
                     'key' => $key,
                     'service' => $this->service,
                     'status' => $response->status(),
@@ -227,7 +227,7 @@ class VaultStorageDriver implements StorageDriverInterface
 
             return true;
         } catch (\Throwable $e) {
-            Log::error('Ошибка при удалении данных из Vault', [
+            Log::channel('stderr')->error('Ошибка при удалении данных из Vault', [
                 'key' => $key,
                 'service' => $this->service,
                 'error' => $e->getMessage(),

@@ -125,7 +125,7 @@ class ConnectionDataProvider implements ConnectionDataProviderInterface
             return $connectionData;
 
         } catch (\Throwable $e) {
-            Log::error('Ошибка при получении данных из внешнего сервиса', [
+            Log::channel('stderr')->error('Ошибка при получении данных из внешнего сервиса', [
                 'identifier' => $identifier,
                 'error' => $e->getMessage(),
             ]);

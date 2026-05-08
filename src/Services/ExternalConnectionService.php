@@ -45,7 +45,7 @@ class ExternalConnectionService implements ExternalConnectionServiceInterface
             $response = $httpClient->get("{$this->apiUrl}/connection/{$url}");
 
             if (!$response->successful()) {
-                Log::error('Ошибка при получении данных подключения', [
+                Log::channel('stderr')->error('Ошибка при получении данных подключения', [
                     'url' => $url,
                     'status' => $response->status(),
                     'response' => $response->body(),
@@ -57,7 +57,7 @@ class ExternalConnectionService implements ExternalConnectionServiceInterface
             $data = $response->json();
 
             if (!is_array($data)) {
-                Log::error('Некорректный формат данных подключения', [
+                Log::channel('stderr')->error('Некорректный формат данных подключения', [
                     'url' => $url,
                     'response' => $data,
                 ]);
@@ -67,14 +67,14 @@ class ExternalConnectionService implements ExternalConnectionServiceInterface
 
             return $data;
         } catch (ConnectionException $e) {
-            Log::error('Ошибка соединения с внешним API', [
+            Log::channel('stderr')->error('Ошибка соединения с внешним API', [
                 'url' => $url,
                 'message' => $e->getMessage(),
             ]);
 
             return null;
         } catch (\Throwable $e) {
-            Log::error('Непредвиденная ошибка при получении данных подключения', [
+            Log::channel('stderr')->error('Непредвиденная ошибка при получении данных подключения', [
                 'url' => $url,
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

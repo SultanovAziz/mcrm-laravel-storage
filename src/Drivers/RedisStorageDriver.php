@@ -36,7 +36,7 @@ class RedisStorageDriver implements StorageDriverInterface
 
             return null;
         } catch (\Throwable $e) {
-            Log::error('Ошибка при получении данных из Redis', [
+            Log::channel('stderr')->error('Ошибка при получении данных из Redis', [
                 'key' => $key,
                 'error' => $e->getMessage(),
             ]);
@@ -53,7 +53,7 @@ class RedisStorageDriver implements StorageDriverInterface
         try {
             return Cache::store($this->store)->put($key, $value, $ttl);
         } catch (\Throwable $e) {
-            Log::error('Ошибка при сохранении данных в Redis', [
+            Log::channel('stderr')->error('Ошибка при сохранении данных в Redis', [
                 'key' => $key,
                 'error' => $e->getMessage(),
             ]);
@@ -70,7 +70,7 @@ class RedisStorageDriver implements StorageDriverInterface
         try {
             return Cache::store($this->store)->forget($key);
         } catch (\Throwable $e) {
-            Log::error('Ошибка при удалении данных из Redis', [
+            Log::channel('stderr')->error('Ошибка при удалении данных из Redis', [
                 'key' => $key,
                 'error' => $e->getMessage(),
             ]);
@@ -87,7 +87,7 @@ class RedisStorageDriver implements StorageDriverInterface
         try {
             return Cache::store($this->store)->has($key);
         } catch (\Throwable $e) {
-            Log::error('Ошибка при проверке ключа в Redis', [
+            Log::channel('stderr')->error('Ошибка при проверке ключа в Redis', [
                 'key' => $key,
                 'error' => $e->getMessage(),
             ]);
@@ -104,7 +104,7 @@ class RedisStorageDriver implements StorageDriverInterface
         try {
             return Cache::store($this->store)->remember($key, $ttl, $callback);
         } catch (\Throwable $e) {
-            Log::error('Ошибка при работе с remember в Redis', [
+            Log::channel('stderr')->error('Ошибка при работе с remember в Redis', [
                 'key' => $key,
                 'error' => $e->getMessage(),
             ]);
